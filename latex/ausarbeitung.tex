@@ -1,0 +1,72 @@
+\documentclass[12pt,titlepage]{article}
+\usepackage{minted}
+\usepackage{enumitem}
+\usepackage{multicol}
+\begin{document}
+%\begin{titlepage}
+%    \begin{center}
+%        \vspace*{1cm}
+%        \textbf{}\\
+%        \vspace*{0.5cm}
+%        \textbf{}\\
+%        \vspace*{0.5cm}
+%        \textbf{Rcpp}\\
+%        \vspace*{1cm}
+%        \textbf{Oliver Heidmann}\\
+%        \textbf{Betreuer:}\\
+%        \vspace*{1cm}
+%        Deutsches Klima Rechenzentrum\\
+%        University of Hamburg\\
+%        \vspace*{0.5cm}
+%        TODO: DATE\\
+%
+%        \date{\today}
+%    \end{center}
+%\end{titlepage}
+\tableofcontents
+\clearpage
+%\begin{abstract}
+%     \end{abstract}
+%\begin{multicols}{2}
+\section{Vectorization}(sum time: 15 min)
+\subsection { why? }
+\subsection { how does it work?} 
+\subsection{what operations can be vectorized}
+\subsection{how does the cpu work in this context}
+\section{Automatic vectorization}(sum time:  5 min)
+\subsection{what code can be vectorized?} (2.5 min)
+\subsection{what hinders automatic vectorization?}(2.5 min)
+    eg array that contains positions (x1, y1, z1, x2, y2, z2 ....) in addition to distance
+    calculations (better: x1 x2 ...., y1 y2 ...., z1 z2) 
+\section{vectorization and g++}
+\subsection{needed flags for output}
+\begin{enumerate}[noitemsep]
+    \item explain code (5 min)
+    \item small example for optimization flags and usage
+    \item compile code with scripts and enabled optimization output to show what happens (5 min)
+\end{enumerate} 
+\subsection{tags for loops eg aligned etc}
+some examples, what do they do, why are they important (5 min)
+
+\section{comparison vectorized(optimized)code/ non vectorized code}
+    small example of the resulting assembler code showing the special commands for the usage of the
+    vector unit  (5 min)
+\section{coding with vectorization in mind}
+eg how do I write code that is easily vectorized. (5 min)
+\section{benchmarks}
+(3 min)
+    \subsection{vectorized vs normal}
+    \subsection{clang vs g++ (both vectorized)}
+\section{Summary} (2min)
+%\subsection{specs}
+%for later use:
+%    \begin{enumerate}[noitemsep]
+%            \item Architecture: x86 64
+%            \item OS: linux 4.7.4-1 (ArchLinux)
+%            \item Ram: 8GB DDR3
+%            \item Cpu: Intel(R) Core(TM) i5-3570K CPU @ 3.40 GHz
+%            \item g++ version
+%        \end{enumerate} 
+%\end{multicols}        
+\end{document}
+
