@@ -1,0 +1,13 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{constexpr} \PYG{k+kt}{size\PYGZus{}t} \PYG{n}{float\PYGZus{}size} \PYG{o}{=} \PYG{k}{sizeof}\PYG{p}{(}\PYG{k+kt}{float}\PYG{p}{)} \PYG{o}{*} \PYG{l+m+mi}{8}\PYG{p}{;}
+\PYG{k}{typedef} \PYG{k+kt}{float} \PYG{n}{float\PYGZus{}32} \PYG{n+nf}{\PYGZus{}\PYGZus{}attribute\PYGZus{}\PYGZus{}}\PYG{p}{((}\PYG{n}{\PYGZus{}\PYGZus{}aligned\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n}{float\PYGZus{}size}\PYG{p}{)))}
+
+\PYG{k+kt}{void} \PYG{n}{test}\PYG{p}{(}\PYG{n}{float\PYGZus{}32} \PYG{o}{*}\PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{vec1}\PYG{p}{,}
+          \PYG{n}{float\PYGZus{}32} \PYG{o}{*}\PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{vec2}\PYG{p}{,}
+          \PYG{n}{float\PYGZus{}32} \PYG{o}{*}\PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{res}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+    \PYG{k}{for} \PYG{p}{(}\PYG{k+kt}{unsigned} \PYG{k+kt}{long} \PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{n}{vector\PYGZus{}size}\PYG{p}{;} \PYG{n}{i}\PYG{o}{++}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+        \PYG{n}{res}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{+=} \PYG{n}{vec2}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{*} \PYG{n}{vec1}\PYG{p}{[}\PYG{n}{i}\PYG{p}{];}
+    \PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+        \PYG{k}{struct} \PYG{n}{vectors}              \PYG{k}{struct} \PYG{n}{particles}
+        \PYG{p}{\PYGZob{}}                           \PYG{p}{\PYGZob{}}
+            \PYG{k+kt}{float} \PYG{n}{x}\PYG{p}{[}\PYG{n}{particle\PYGZus{}cnt}\PYG{p}{];}    \PYG{n}{vectors} \PYG{n}{pos}\PYG{p}{;}
+            \PYG{k+kt}{float} \PYG{n}{y}\PYG{p}{[}\PYG{n}{particle\PYGZus{}cnt}\PYG{p}{];}    \PYG{n}{vectors} \PYG{n}{velo}\PYG{p}{;}
+            \PYG{k+kt}{float} \PYG{n}{z}\PYG{p}{[}\PYG{n}{particle\PYGZus{}cnt}\PYG{p}{];}    \PYG{n}{vectors} \PYG{n}{accel}\PYG{p}{;}
+        \PYG{p}{\PYGZcb{}}                           \PYG{p}{\PYGZcb{}}
+\end{Verbatim}

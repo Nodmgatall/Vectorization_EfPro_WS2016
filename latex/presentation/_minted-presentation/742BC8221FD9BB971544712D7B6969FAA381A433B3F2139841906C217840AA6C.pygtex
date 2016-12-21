@@ -1,0 +1,14 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+            float first\PYG{p}{;}
+            float second\PYG{p}{;}
+            float third\PYG{p}{;}
+            float n\PYGZus{}th
+        \PYG{p}{\PYGZcb{}}
+        std\PYG{o}{::}\PYG{k+kt}{vector}\PYG{o}{\PYGZlt{}}my\PYGZus{}pair\PYG{o}{\PYGZgt{}} pairs\PYG{p}{(}\PYG{l+m}{1000}\PYG{p}{);}
+    pairs.init\PYGZus{}all\PYG{p}{(}random\PYGZus{}numbers\PYG{p}{);}
+
+    \PYG{k+kr}{for}\PYG{p}{(}int i \PYG{o}{=} \PYG{l+m}{0}\PYG{p}{;} i \PYG{o}{\PYGZlt{}} \PYG{l+m}{1000}\PYG{p}{)}
+    \PYG{p}{\PYGZob{}}
+        sum \PYG{o}{+=} tupels\PYG{p}{[}i\PYG{p}{]}\PYG{l+m}{.}first\PYG{p}{;}
+    \PYG{p}{\PYGZcb{}}
+\end{Verbatim}

@@ -1,0 +1,15 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+        \PYG{k}{struct} \PYG{n}{my\PYGZus{}tupel}\PYG{p}{\PYGZob{}}
+            \PYG{k+kt}{float} \PYG{n}{first}\PYG{p}{;}
+            \PYG{k+kt}{float} \PYG{n}{second}\PYG{p}{;}
+            \PYG{k+kt}{float} \PYG{n}{third}\PYG{p}{;}
+            \PYG{k+kt}{float} \PYG{n}{n\PYGZus{}th}
+        \PYG{p}{\PYGZcb{}}
+    \PYG{n}{std}\PYG{o}{::}\PYG{n}{vector}\PYG{o}{\PYGZlt{}}\PYG{n}{my\PYGZus{}pair}\PYG{o}{\PYGZgt{}} \PYG{n}{pairs}\PYG{p}{(}\PYG{l+m+mi}{1000}\PYG{p}{);}
+    \PYG{n}{pairs}\PYG{p}{.}\PYG{n}{init\PYGZus{}all}\PYG{p}{(}\PYG{n}{random\PYGZus{}numbers}\PYG{p}{);}
+
+    \PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{1000}\PYG{p}{)}
+    \PYG{p}{\PYGZob{}}
+        \PYG{n}{sum} \PYG{o}{+=} \PYG{n}{tupels}\PYG{p}{[}\PYG{n}{i}\PYG{p}{].}\PYG{n}{first}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{}}
+\end{Verbatim}

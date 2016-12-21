@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{err}{\PYGZbs{}}\PYG{n}{begin}\PYG{p}{\PYGZob{}}\PYG{n}{frame}\PYG{p}{\PYGZcb{}}
+    \PYG{err}{\PYGZbs{}}\PYG{n}{begin}\PYG{p}{\PYGZob{}}\PYG{n}{itemize}\PYG{p}{\PYGZcb{}}
+        \PYG{err}{\PYGZbs{}}\PYG{n}{item} \PYG{n+nl}{TODO}\PYG{p}{:} \PYG{n}{add} \PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{explanation}
+    \PYG{err}{\PYGZbs{}}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{itemize}\PYG{p}{\PYGZcb{}}
+\PYG{err}{\PYGZbs{}}\PYG{n}{end}\PYG{p}{\PYGZob{}}\PYG{n}{frame}\PYG{p}{\PYGZcb{}}
+
+\PYG{err}{\PYGZbs{}}\PYG{n}{begin}\PYG{p}{\PYGZob{}}\PYG{n}{frame}\PYG{p}{\PYGZcb{}[}\PYG{n}{fragile}\PYG{p}{]}
+    \PYG{err}{\PYGZbs{}}\PYG{n}{frametitle}\PYG{p}{\PYGZob{}}\PYG{n}{Compmart} \PYG{n}{but} \PYG{n}{not} \PYG{n}{perfect}\PYG{p}{\PYGZcb{}}
+    \PYG{err}{\PYGZbs{}}\PYG{n}{begin}\PYG{p}{\PYGZob{}}\PYG{n}{minted}\PYG{p}{\PYGZcb{}\PYGZob{}}\PYG{n}{c}\PYG{o}{++}\PYG{p}{\PYGZcb{}}
+\PYG{k+kt}{void} \PYG{n}{test}\PYG{p}{(}\PYG{k+kt}{float} \PYG{o}{*}\PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{vec1}\PYG{p}{,} \PYG{k+kt}{float} \PYG{o}{*}\PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{vec2}\PYG{p}{,} \PYG{k+kt}{float} \PYG{o}{*}\PYG{n}{\PYGZus{}\PYGZus{}restrict} \PYG{n}{res}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{k}{for} \PYG{p}{(}\PYG{k+kt}{unsigned} \PYG{k+kt}{long} \PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{n}{vector\PYGZus{}size}\PYG{p}{;} \PYG{n}{i}\PYG{o}{++}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+        \PYG{n}{res}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{+=} \PYG{n}{vec2}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{*} \PYG{n}{vec1}\PYG{p}{[}\PYG{n}{i}\PYG{p}{];}
+        \PYG{n}{res}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{/=} \PYG{n}{vec2}\PYG{p}{[}\PYG{n}{i}\PYG{p}{];}
+        \PYG{n}{res}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{\PYGZhy{}=} \PYG{n}{vec1}\PYG{p}{[}\PYG{n}{i}\PYG{p}{];}
+    \PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}
