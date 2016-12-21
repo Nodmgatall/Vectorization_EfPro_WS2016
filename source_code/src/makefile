@@ -41,6 +41,9 @@ restrict:
 aligned:
 	g++ -c test_aligned.cpp -O1 -save-temps -ftree-vectorize -fopt-info-vec
 	g++ -o aligned.x -O1 test_aligned.o test-main.cpp -save-temps
+omp:
+	g++ -c pragma.cpp -O1 -save-temps -ftree-vectorize -fopt-info-vec -fopenmp
+	g++ -o pragma.x -O1 pragma.o test-main.cpp -save-temps
 comparison: O1 vectorized restrict aligned
 run_compartison: comparison
 	./test.x
