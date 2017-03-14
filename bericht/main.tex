@@ -1,0 +1,198 @@
+\documentclass[
+	12pt,
+	a4paper,
+	BCOR10mm,
+	%chapterprefix,
+	DIV14,
+	headsepline,
+	usegeometry,
+	%twoside,
+	%openright
+]{scrreprt}
+
+\KOMAoptions{
+	listof=totoc,
+	bibliography=totoc,
+	index=totoc
+}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{lmodern}
+
+\usepackage[ngerman,english]{babel}
+
+\usepackage[toc]{appendix}
+\usepackage{color}
+\usepackage{eurosym}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage[htt]{hyphenat}
+\usepackage{listings}
+\usepackage{lstautogobble}
+\usepackage{microtype}
+\usepackage[list=true,hypcap=true]{subcaption}
+\usepackage{textcomp}
+\usepackage{units}
+
+\usepackage{varioref}
+\usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+
+\definecolor{uhhred}{cmyk}{0,1,1,0}
+
+\lstset{
+	basicstyle=\ttfamily,
+	frame=single,
+	numbers=left,
+	language=C,
+	breaklines=true,
+	breakatwhitespace=true,
+	postbreak=\hbox{$\hookrightarrow$ },
+	showstringspaces=false,
+	autogobble=true,
+	upquote=true,
+	tabsize=4,
+	captionpos=b,
+	morekeywords={int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,size_t,ssize_t,off_t,intptr_t,uintptr_t,mode_t}
+}
+
+\makeatletter
+\renewcommand*{\lstlistlistingname}{List of Listings}
+\makeatother
+
+\begin{document}
+
+\newgeometry{left=2cm, top=2cm, right=2cm, bottom=2cm}
+
+\begin{titlepage}
+	\includegraphics[width=0.5\textwidth]{UHH-Logo_2010_Farbe_CMYK}
+
+	\begin{center}
+		{\Large \textcolor{uhhred}{\textbf{Report}}\par}
+
+		\vspace{1cm}
+
+		{\titlefont\huge Vectorization \par}
+
+		\vspace{1cm}
+
+		{\large vorgelegt von\par}
+
+		\vspace{0.5cm}
+
+		{\large Vorname Nachname\par}
+	\end{center}
+
+	\vfill
+
+	{\large\noindent\begin{tabular}{l}
+		Fakultät Informatik und Naturwissenschaften\\
+		Fachbereich Informatik\\
+		Arbeitsbereich Wissenschaftliches Rechnen
+	\end{tabular}\par}
+
+	\vspace{1cm}
+
+	{\large\noindent\begin{tabular}{ll}
+		Studiengang:    &  SSE\\
+		Matrikelnummer: & 6420331\\
+		\\
+		Betreuer:       & Nabeeh Jumah \\
+		\\
+		Hamburg, 2017-03-25
+	\end{tabular}\par}
+\end{titlepage}
+
+\restoregeometry
+
+\chapter*{Abstract}
+
+\thispagestyle{empty}
+
+This report discusses the basics of vectorization. It contains basic examples as well as some problems a programmer will encounter when working with
+vectorization. It includes some the different instruction sets as well as differences between
+compilers. The goal of this is to give a robust basic knowledge of the principles of
+vectorization and to give an introduction on how to apply this form of optimization.
+%TODO: add: different approaches (intinsics, auto vectorization, omp)
+\tableofcontents
+
+\chapter{Introduction}
+There are many techniques for improving performance of computations. Many need special or a huge
+amount of hardware and as such are expensive. Vectorisation is readily available since TODO: DATE
+and most if not all modern hardware supports vectorization. If code is written to allow this form
+of parallelism the performance gain gain can be, depending on the type used in the calculation, as
+huge as 400\% and more. As such every programmer should have a
+basic understanding of what vectorization is, what it can do and how to use it to
+improve performance. The goal of this report is to give a basic understanding of vectorization and
+to be used as a introduction to writing vectorized code. Most of the examples are for GNU's GCC
+compiler but differences between compilers in regards to vectorization are detailed as well.
+In this context this report includes the different ways vectorization can be applied and the pros
+and cons for each technique.
+
+%_____________________________________________________________________________________________________
+\chapter{Instruction Sets}
+    \section{MMX}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    \section{AVX}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    \section{SSE}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    \section{AVX2}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    \section{SSE2}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    \section{Architectures and Sets}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+\chapter{Vectorization CPU components}
+In the Chapter prior to this it was shown what the different instruction sets allow to be done. But
+the question how it is possible that a CPU can calculate 2 - 16 calculations at the same time was
+not answered. In this section we will tackle the answer to that question and elaborate the
+different components present in every modern CPU that make vectorization possible.
+There are three components that the extended instruction sets use: The vector-unit, the
+vector-registers and the bus that connects regular memory with the just mentioned
+vector-components. Details on them are in the following sections.
+\section{Vector Units}
+
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+\section{Vector Registers}
+
+\section{TODO: GIVE NAME, the bus}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+%_____________________________________________________________________________________________________
+\chapter{Requirements for Vectorization}
+    %continues data
+    %continues data access
+    %no if block
+%_____________________________________________________________________________________________________
+\chapter{Auto vectorization}
+    \section{Compiler differences}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+%_____________________________________________________________________________________________________
+\chapter{Applying Vectorization manualy}
+    \section{OMP}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    \section{intrinsics}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+%_____________________________________________________________________________________________________
+\chapter{Resolving issues}
+%_____________________________________________________________________________________________________
+\chapter{Conclusion}
+\label{Conclusion}
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+At vero eos et accusam et justo duo dolores et ea rebum.
+Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\bibliographystyle{alpha}
+\bibliography{literatur}
+
+\appendix
+\appendixpage
+
+\end{document}
