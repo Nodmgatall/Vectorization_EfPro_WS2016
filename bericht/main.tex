@@ -10,19 +10,22 @@
 	%openright
 ]{scrreprt}
 
+    \pdfminorversion=6
+
 \KOMAoptions{
 	listof=totoc,
 	bibliography=totoc,
 	index=totoc
 }
-
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-
+\usepackage{minted}
+    \renewcommand\listingscaption{CodeSnippet}
 \usepackage{lmodern}
-
+\usepackage{pgfplots}
+\usetikzlibrary{pgfplots.groupplots}
+\usepackage{filecontents}
 \usepackage[ngerman,english]{babel}
-
 \usepackage[toc]{appendix}
 \usepackage{color}
 \usepackage{eurosym}
@@ -36,10 +39,11 @@
 \usepackage[list=true,hypcap=true]{subcaption}
 \usepackage{textcomp}
 \usepackage{units}
-
+\usepackage{csvsimple}
 \usepackage{varioref}
 \usepackage[hidelinks]{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
+\usepackage{url}
 
 \definecolor{uhhred}{cmyk}{0,1,1,0}
 
@@ -134,53 +138,448 @@ and cons for each technique.
 
 %_____________________________________________________________________________________________________
 \chapter{Instruction Sets}
+Over the years several single instruction multiple data instruction sets(SIMD) were released.
+In this chapter we will iterate over most of them and show the extensions each release featured.
     \section{MMX}
-%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    \section{AVX}
+    MMX was introduced 1997 by Intel together with the P5-based Pentium processors. It defines 8
+    64-bit wide vector register named MM0 to MM7 and the operations needed to use those. MXX offers
+    only integer operations.
+    For compatibility reasons the registers are nothing more than aliases for the x87 FPU
+    registers.
+    This meant that the programmer needed to
+    decide in which mode his application should run since switching between floating point
+    mode and integer mode was time consuming at best. \cite{MMX_WIK}
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     \section{SSE}
+    SSE introduced special independent vector registers called
+    XMM registers. Those registers now had a 128 bit size and were used for the with SSE introduced
+    capability to use floating point operations. Integer operations were sill using the MMX
+    registers. Earlier versions of SSE had 8 XMM registers and later, starting with the Intel
+    64 architecture, additional 8 XMM registers were added although these are only accessible in
+    64-bit operating mode. 
+    This instruction set added 70 new instructions to the already present MXX instructions.
+    SSE was first introduced with the pentium III 
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    \section{AVX2}
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     \section{SSE2}
+    With this instruction set the problems of mode switching when using SIMD with integer
+    operations were circumvented by implementing most SEE2 integer instructions to use the in SSE
+    introduced XMM registers instead of the MXX registers. This increased performance significantly
+    as the newer XMM registers were wider since they allowed to load and process two times more data.
+    While the performance was increased through using the XMM registers the precision was lowered
+    since FPU registers offered a higher precision than the XMM registers.
+    Pentium 4 2001.
+    \section{SSE3}
+    SSE3 added the capability to work in a register. Meaning that with this addition it is possible
+    to add and subtract values stored in a register. Further a method for converting floating point
+    variables to integer variables.
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    \section{Architectures and Sets}
+    \section{AVX/AVX2/AVX-512}
+    With AVX the width of the vector-registers was enlarged to 256bit and the registers were
+    renamed to YMM0 to YMM15. AVX also added 3 operand simd allowing ${a = a + b}$ type operations to
+    be changed to ${c = a + b}$ so that the source variables $a$ and $b$ can be used in further
+    calculations without changing the result. AVX was introduced together with the Sandy Bridge
+    architecture in 2008.\newline
+    AVX2 expanded most integer commands to 256 bits.\newline
+    AVX-512 later expanded the register size to 512 bits.\cite{AVX-AVX2-AVX512}
+
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 \chapter{Vectorization CPU components}
 In the Chapter prior to this it was shown what the different instruction sets allow to be done. But
-the question how it is possible that a CPU can calculate 2 - 16 calculations at the same time was
+the question how a CPU can calculate 2 - 16 calculations at the same time was
 not answered. In this section we will tackle the answer to that question and elaborate the
 different components present in every modern CPU that make vectorization possible.
 There are three components that the extended instruction sets use: The vector-unit, the
 vector-registers and the bus that connects regular memory with the just mentioned
-vector-components. Details on them are in the following sections.
+vector-components. Details on them are in the following sections. \cite{IntelSIMDdef}
 \section{Vector Units}
-
-%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Vector-Units are specially designed computation units which can compute multiple operations at
+once. Where a regular unit has one input of width 32bit or 64bit (depending on architecture)
+vector-units have wider input ranging from 128(sse) to 512 (AVX-512). Using SSE the table
+\ref{table:tac} shows how many computations can be done at once with given type.
+\begin{table}[ht]
+    \centering
+        \begin{tabular}{c|c|c|c|c}
+            Type      & MMX & SSE & AVX & AVX-512\\
+            \hline
+            short int & 8   & 16  & 32  & 64 \\
+            \hline
+            int       & 2   & 4   & 8   & 16 \\
+            \hline
+            float     & -   & 4   & 8   & 16 \\
+            \hline
+            double    & -   & 2   & 4   & 8\\
+        \end{tabular} 
+            \caption{type and \#calculations}
+        \label{table:tac}
+    \end{table}
+    %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 \section{Vector Registers}
+Vector registers have the same width as the vector-unit's in- and output. In these registers all
+data that is meant to be processed through the vector-units is loaded to and from. When using
+vector-units these are used instead of the scalar registers.
 
-\section{TODO: GIVE NAME, the bus}
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 %_____________________________________________________________________________________________________
 \chapter{Requirements for Vectorization}
-    %continues data
-    %continues data access
-    %no if block
+In the Chapter before we introduced  the hardware components for vectorization. Through the way
+these work there are some restrictions on what code can be vectorized. In this section those
+restrictions which can hinder or even make vectorization impossible will be introduced.
+\section{Coherent data storage}
+For vectorization to work best the data on which is operated should be stored in continues arrays.
+If stored properly data can be loaded and stored in chunks while using only one instruction. As
+such the approach of using objects of arrays instead of arrays of objects will result in better
+vectorization in most cases. 
+\begin{figure}[h]
+    \centering
+    \begin{minipage}[t]{.45\textwidth}
+        \begin{minted}{cpp}
+struct vec3d{
+    type x;
+    type y;
+    type z;
+}
+std::vector<vec3d> vec3d_objs;
+sum_all_x(vec3d_objs);
+        \end{minted}
+
+        \includegraphics[width=0.77\textwidth]{loading_obj_var.png}
+        \caption{using array of objects}
+    \end{minipage}
+    \begin{minipage}[t]{.45\textwidth}
+        \begin{minted}{cpp}
+struct vec3ds{
+    std::vector<type> x_elements;
+    std::vector<type> y_elements;
+    std::vector<type> z_elements;
+}
+vec3ds my_vectors;
+my_vectors.sum_all_x();
+        \end{minted}
+        \includegraphics[width=0.77\textwidth]{loading_simd.png}
+    \caption{TODO}
+    \label{fig:obj_load}
+    \end{minipage}
+\end{figure} 
+Although there is the option to use a simd gather instruction which will load the different
+variables from figure \ref{fig:obj_load} faster than fetching the variables element wise the
+restructuring of the data layout in combination with a simple simd packed load will be faster.
+\section{alignment}
+\includegraphics[width=0.77\textwidth]{AlignmentVisualisation.png}
+\section{aliasing}
+Aliasing can cause functions to perform different when vectorized. The compiler needs to check if
+two pointer are references to values in the same memory block. This can hinder the vectorization or
+even make it impossible. The developer need to assure the compiler that no pointer is an alias
+inside the to be vectorized function.
+\section{Function calls}
+Non inlined function calls can not be vectorized. And if profitable should be moved into their own
+loop. \cite{ExternalFunctionSource}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}[t]{.45\textwidth}
+        \begin{minted}{cpp}
+for(int i = 0; i < SIZE; i++){
+    dest[i] = vec1[i] + vec2[i];
+    dest[i] = pow(dest[i]);
+    dest[i] = dest[i] / 1.4;
+}
+        \end{minted}
+
+        \caption{using array of objects}
+    \end{minipage}
+    \begin{minipage}[t]{.45\textwidth}
+        \begin{minted}{cpp}
+for(int i = 0; i < SIZE; i++){
+    dest[i] = vec1[i] + vec2[i];
+}
+for(int i = 0; i < SIZE; i++){
+    dest[i] = pow(dest[i]);
+}
+for(int i = 0; i < SIZE; i++){
+    dest[i] = dest[i] / 1.4;
+}
+        \end{minted}
+    \caption{TODO}
+    \label{fig:obj_load}
+    \end{minipage}
+\end{figure} 
+If moved the first and the second loop will be vectorized. 
+
+\section{Branching}
+Branching through switch case statements or if-else blocks are not vectorizable. There are some
+exceptions e.g. a very simple if statement such as:
+        \begin{minted}{cpp}
+            bool b[16] = {false, false, ...}:
+            int interger[16];
+            for(int i = 0; i < 16; i++){
+            if(interger[i] < 10) { b[i] = true;}
+            }
+        \end{minted}
 %_____________________________________________________________________________________________________
 \chapter{Auto vectorization}
-    \section{Compiler differences}
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Modern compilers offer to vectorize programs for the developer. To enable compilers to do so,
+certain requirements must be met. In this chapter those requirements will be explained in context
+with the GNU compiler Gcc.The default optimization flag for Gcc is -O2 which does not include 
+auto vectorisation. To use the auto vectorisation either the optimization flag -O3 (or better e.g. -Ofast)
+or the flag -ftree-vectorize have to be used. In some cases further flags like -fassociative-math
+are required for vectorization. The following code will be a example on how to change code so that
+it can be successfully vectorized.
+\begin{listing}[ht]
+\begin{minted}[linenos]{cpp}
+void normal(type *vec1, type *vec2,
+    unsigned long size, type *return_vec)
+{
+    for (unsigned long i = 0; i < size; i++)
+    {
+        return_vec[i] += vec1[i] + vec2[i];
+    }
+}
+\end{minted}
+\caption{Function without changes for vectorization}
+\label{lst:code1}
+\end{listing}
+This function is very simple as the only thing it does is to add 2 arrays element wise and to store
+the results in another array.
+When compiling this with \newline
+g++ -std=c++11 -fopt-info-optimized -ftree-vectorize -fopt-info-missed -O2 -funroll-loops -msse3
+main.cpp we get the following output:
+\begin{minted}[fontsize=\footnotesize]{bash}
+g++ -c  normalvec.cpp -msse3 -O2 -funroll-loops -ftree-vectorize-fopt-info-vec-optimized
+normal.cpp:4:33: note: loop vectorized
+normal.cpp:4:33: note: loop versioned for vectorization because of possible aliasing
+normal.cpp:4:33: note: loop peeled for vectorization to enhance alignment
+\end{minted}
+Since the function is very simple the gcc 6.3 compiler is able do vectorize this to be even better
+than what will be shown in the following sections. For the sake of explaining what would be needed
+to write a more complex vectorizable function we will use the function without any vectorization enabled to
+highlight the potential difference vectorization can make. In graph \ref{fig:graphNorVecnor} we see the run times of
+the unvectorized function in comparison with the completely auto vectorized function. 
+\begin{figure}[ht]
+    \begin{tikzpicture}[scale=0.66]
+
+    \begin{axis}[legend pos=outer north east,
+        xlabel=\#Entries,
+        ylabel=runtime sum
+        ]
+             \addplot table [y=normal       , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{normal }
+  \addplot table [y=normalvec     , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{normalvec }
+
+        \end{axis}
+    \end{tikzpicture}
+    \caption{unvectorized function}
+    \label{fig:graphNorVecnor}
+\end{figure}
+In the following section we will show the steps to vectorize the function manually. It is to note
+that vectorizing manually disallows the compiler to vectorize as he would normally do. Thus the
+results of each step of vectorizing the function is worse than doing nothing. All steps combined
+are as good as if nothing had been done. This section is only for highlighting the difference in
+the different steps and to explain the different concepts behind what makes vectorization possible
+for more complex functions.
+
+
+
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+\section{No aliases}
+Vectorization does not work when arrays on which the calculations should be performed are
+overlapping or are aliases of each other. In the earlier shown function (CodeSnippet:
+[\ref{lst:code1}]) the compiler would not know if the given pointer point at the same or to
+a given sub part of memory. To let the compiler know that they are not overlapping the keyword
+restrict can be used (CodeSnippet\ref{lst:code2}: line:1). This keyword should only be used if the
+developer knows for certain that the given pointer will never refer to the same memory block.
+Otherwise the results of the calculations can (and probably will) be wrong. If used correctly the
+restrict keyword or any other form of assuring the compiler that there are no overlaps will result
+in a better vectorization as extra checks if overlaps are present will not be needed.
+\begin{listing}
+\begin{minted}[fontsize=\footnotesize]{cpp}
+void no_alias(type *__restrict__ vec1,
+    type *__restrict__ vec2, unsigned long size,
+              type *__restrict__ return_vec)
+{
+    for (unsigned long i = 0; i < size; i++) {
+        return_vec[i] += vec1[i] + vec2[i];
+    }
+}
+\end{minted}
+\caption{Function without changes for vectorization}
+\label{lst:code2}
+\end{listing}
+
+When we compile this function with the same parameters as stated in the beginning of this chapter
+we get: 
+\begin{minted}[fontsize=\footnotesize]{bash}
+g++ -c  no_alias.cpp -msse3 -O1 -funroll-loops -ftree-vectorize-fopt-info-vec-optimized
+no_alias.cpp:4:33: note: loop vectorized
+no_alias.cpp:4:33: note: loop peeled for vectorization to enhance alignment
+\end{minted}
+Here we see that now the program does no longer need to check for aliases.
+The following graph \ref{tik:uvVsNa} shows the difference between the unvectorized function and the function where
+we assured the compiler that the arrays vec1 and vec2 are distinct memory blocks.
+
+\begin{figure}[ht]
+  \begin{tikzpicture}[scale=0.66]
+
+        \begin{axis}[legend pos=outer north east,
+            xlabel=\#Entries,
+            ylabel=runtime sum
+            ]
+                 \addplot table [y=normal      , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{normal }
+                \addplot table [y=noalias      , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{noalias}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{unvectorized function}
+        \label{tik:uvVsNa}
+    \end{figure}
+
+
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+\section{Alignment}
+Alignment allows for packaged data which can be loaded in one instruction.
+\subsection{Scalar}
+\subsection{Packaged}
+
+\begin{figure}[ht]
+    \begin{tikzpicture}[scale=0.66]
+
+        \begin{axis}[legend pos=outer north east,
+            xlabel=\#Entries,
+            ylabel=runtime sum
+            ]
+                 \addplot table [y=normal , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{normal }
+                \addplot table [y=aligned , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{aligned}
+
+            \end{axis}
+        \end{tikzpicture}
+        \caption{unvectorized function}
+    \end{figure}
+\begin{minted}[fontsize=\footnotesize]{bash}
+g++ -c  aligned.cpp -msse3 -O2 -funroll-loops -ftree-vectorize-fopt-info-vec-optimized
+normal.cpp:4:33: note: loop vectorized
+normal.cpp:4:33: note: loop versioned for vectorization because of possible aliasing
+\end{minted}
+
+%_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+\section{Alignment and Restrict combined}
+
+\begin{minted}[fontsize=\footnotesize]{bash}
+g++ -c  vectorizable.cpp -msse3 -O2 -funroll-loops -ftree-vectorize-fopt-info-vec-optimized
+normal.cpp:4:33: note: loop vectorized
+normal.cpp:4:33: note: loop versioned for vectorization because of possible aliasing
+\end{minted}
+\begin{figure}[ht]
+  \begin{tikzpicture}[scale=0.66]
+
+        \begin{axis}[legend pos=outer north east,
+            xlabel=\#Entries,
+            ylabel=runtime sum
+            ]
+            %     \addplot table [y=normal      , x=rowname , col sep=comma]{src/result_sse3_sse3_O2_unroll.txt};
+            %    \addlegendentry{normal }
+            %    \addplot table [y=aligned      , x=rowname , col sep=comma]{src/result_sse3_sse3_O2_unroll.txt};
+            %    \addlegendentry{aligned}
+            %    \addplot table [y=noalias      , x=rowname , col sep=comma]{src/result_sse3_sse3_O2_unroll.txt};
+            %    \addlegendentry{noalias}
+            %    \addplot table [y=vectorizable , x=rowname , col sep=comma]{src/result_sse3_sse3_O2_unroll.txt};
+            %    \addlegendentry{vectorizable}
+
+            %\addplot table [y=normal      , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            %    \addlegendentry{normal }
+                \addplot table [y=aligned      , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{aligned}
+                \addplot table [y=noalias      , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{noalias}
+                \addplot table [y=vectorizable , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{vectorizable}
+ \addplot table [y=normalvec     , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{normalvec }
+
+
+            \end{axis}
+        \end{tikzpicture}
+        \caption{unvectorized function}
+    \end{figure}
+\begin{figure}[ht]
+    \begin{tikzpicture}[scale=0.66]
+        \begin{axis}[legend pos=outer north east,
+            xlabel=\#Entries,
+            ylabel=runtime sum%,
+              %ymin=2.5, xmin=20000,
+                %xmax=163000, ymax=6,
+                %restrict y to domain=2.5:6
+                ]
+
+            \addplot table [y expr=\thisrow{normal}/\thisrow{aligned}
+                , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{aligned}
+            \addplot table [y expr=\thisrow{normal}/\thisrow{noalias}
+                , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{noalias}
+            \addplot table [y expr=\thisrow{normal}/\thisrow{vectorizable} 
+                , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{vectorizable}
+\addplot table [y expr=\thisrow{normal}/\thisrow{normalvec} 
+                , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{normalvec}
+
+            \end{axis}
+        \end{tikzpicture}
+        \caption{stages of vectorization speedup}
+    \end{figure}
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 %_____________________________________________________________________________________________________
+
 \chapter{Applying Vectorization manualy}
     \section{OMP}
+\begin{figure}[ht]
+    \begin{tikzpicture}
+        \begin{axis}[legend pos=outer north east%,
+                %ymin=1.0, xmin=20000,
+                %xmax=163000, ymax=4,
+                %restrict y to domain=1:4
+            ]
+
+\addplot table [y expr=\thisrow{normal}/\thisrow{normalvec}    , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{normalvec }
+
+                \addplot table [y expr=\thisrow{normal}/\thisrow{aligned}    , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{aligned }
+
+                \addplot table [y expr=\thisrow{normal}/\thisrow{noalias}      , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{noalias }
+
+                \addplot table [y expr=\thisrow{normal}/\thisrow{vectorizable} , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{vectorizable }
+
+                \addplot table [y expr=\thisrow{normal}/\thisrow{omp}        , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+                \addlegendentry{omp }
+            \end{axis}
+        \end{tikzpicture}
+        \caption{TODO NEEDS A NAME}
+    \end{figure}
+
+
+
+
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     \section{intrinsics}
 %_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+ 
+
+%__________________________________________________________________________NEWSTUFF
+
 
 %_____________________________________________________________________________________________________
-\chapter{Resolving issues}
 %_____________________________________________________________________________________________________
 \chapter{Conclusion}
 \label{Conclusion}
@@ -189,10 +588,47 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 At vero eos et accusam et justo duo dolores et ea rebum.
 Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
-\bibliographystyle{alpha}
 \bibliography{literatur}
+\bibliographystyle{ieeetr}
 
-\appendix
-\appendixpage
+\begin{figure}[ht]
+    \begin{tikzpicture}[scale=0.66]
 
+        \begin{axis}[legend pos=outer north east,
+            xlabel=\#Entries,
+            ylabel=runtime sum
+            ] 
+                \addplot table [y=normalvec , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{normalvec }
+                \addplot table [y=normal , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{normal }
+                \addplot table [y=aligned , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{aligned}
+                \addplot table [y=noalias , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+                \addlegendentry{noalias}
+
+        \end{axis}
+    \end{tikzpicture}
+    \caption{unvectorized function}
+\end{figure}
+\begin{figure}[ht]
+    \begin{tikzpicture}[scale=0.66]
+
+        \begin{axis}[legend pos=outer north east,
+            xlabel=\#Entries,
+            ylabel=runtime sum
+            ] 
+            \addplot table [y=normalvec , x=rowname , col sep=comma]{src/result_new_sse3_O1_unroll.txt};
+            \addlegendentry{normalvec }
+            \addplot table [y=normalvec , x=rowname , col sep=comma]{src/result_new_sse3_O1_nounroll.txt};
+            \addlegendentry{normalvec }
+            \addplot table [y=normalvec , x=rowname , col sep=comma]{src/result_new_sse3_O2_unroll.txt};
+            \addlegendentry{normalvec }
+            \addplot table [y=normalvec , x=rowname , col sep=comma]{src/result_new_sse3_O2_nounroll.txt};
+            \addlegendentry{normalvec }
+        \end{axis}
+    \end{tikzpicture}
+    \caption{unvectorized function}
+\end{figure}
 \end{document}
+

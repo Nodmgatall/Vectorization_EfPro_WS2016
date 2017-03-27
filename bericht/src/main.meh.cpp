@@ -1,3 +1,4 @@
+
 #include "func_defs.hpp"
 #include "simpbench.hpp"
 #include "type_declaration.hpp"
@@ -41,11 +42,11 @@ int main(int argc, char **argv) {
     type ret_vec[SIZE];
     // fill_array(ret_vec, SIZE);
 
-    type vec1_aligned[SIZE] __attribute__((aligned(32)));
+    type vec1_aligned[SIZE] __attribute__((aligned(16)));
     // fill_array(vec1_aligned, SIZE);
-    type vec2_aligned[SIZE] __attribute__((aligned(32)));
+    aligned_type vec2_aligned[SIZE] __attribute__((aligned(16)));
     // fill_array(vec2_aligned, SIZE);
-    type ret_vec_alinged[SIZE] __attribute__((aligned(32)));
+    aligned_type ret_vec_alinged[SIZE] __attribute__((aligned(16)));
     // fill_array(ret_vec_alinged, SIZE);
 
     fill_array(vec1, SIZE);
@@ -54,40 +55,40 @@ int main(int argc, char **argv) {
     fill_array(vec1_aligned, SIZE);
     fill_array(vec2_aligned, SIZE);
 
+    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
         benchmark.start("normal");
-    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
         normal(vec1, vec2, SIZE, ret_vec);
-    }
         benchmark.end("normal");
+    }
 
+    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
         benchmark.start("aligned");
-    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
         aligned(vec1_aligned, vec2_aligned, SIZE, ret_vec_alinged);
-    }
         benchmark.end("aligned");
+    }
+    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
         benchmark.start("noalias");
-    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
         no_alias(vec1, vec2, SIZE, ret_vec);
-    }
         benchmark.end("noalias");
-
-        benchmark.start("vectorizable");
-    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
-        vectorizable(vec1_aligned, vec2_aligned, SIZE, ret_vec_alinged);
     }
-        benchmark.end("vectorizable");
-        benchmark.start("omp");
+
     for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
+        benchmark.start("vectorizable");
+        vectorizable(vec1_aligned, vec2_aligned, SIZE, ret_vec_alinged);
+        benchmark.end("vectorizable");
+    }
+    for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
+        benchmark.start("omp");
+        omp(vec1_aligned, vec2_aligned, SIZE, ret_vec_alinged);
         benchmark.end("omp");
     }
-        omp(vec1_aligned, vec2_aligned, SIZE, ret_vec_alinged);
 
-        benchmark.start("normalvec");
     for (unsigned long i = 0; i < INTERATION_COUNT; i++) {
-        normalvec(vec1, vec2, SIZE, ret_vec);
+        benchmark.start("normalvec");
+        normalvec(vec1_aligned, vec2_aligned, SIZE, ret_vec_alinged);
+        benchmark.end("normalvec");
     }
 
-        benchmark.end("normalvec");
     benchmark.sum_all_results();
     benchmark.open_file(filename);
     benchmark.write(0, std::to_string(SIZE));

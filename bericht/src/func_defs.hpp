@@ -5,6 +5,8 @@ void vectorizable(aligned_type *__restrict__ vec1, aligned_type *__restrict__ ve
 
 
 void normal(type *vec1, type *vec2, unsigned long size, type *return_vec);
+void normalvec(type *vec1, type *vec2, unsigned long size, type *return_vec);
+void omp(type *vec1, type *vec2, unsigned long size, type *return_vec);
 
 
 void no_alias(type *__restrict__ vec1, type *__restrict__ vec2, unsigned long size,
